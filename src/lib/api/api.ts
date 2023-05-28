@@ -5,7 +5,7 @@ import {
 } from "../../types/type";
 
 const endPoint =
-  "https://us-central1-compass-hr.cloudfunctions.net/mock/facilitator";
+  "https://us-central1-compass-hr.cloudfunctions.net/mock/facilitators";
 
 export async function fetchFacilitators({
   _page = "1",
@@ -21,20 +21,41 @@ export async function fetchFacilitators({
     _order,
   };
 
-  if (_search) {
-    params["name_like"] = _search;
-    params["loginId_like"] = _search;
+  // 検索ワードがないとき
+  if (!_search) {
+    const res = await axios
+      .get(endPoint, { params })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error;
+      });
+    return res;
   }
 
-  const res = await axios
-    .get(endPoint, { params })
+  // 検索ワードがある場合、名前/ログインIDを同時に検索はできないので名前から検索する
+  const resWord = await axios
+    .get(endPoint, { params: { ...params, name_like: _search } })
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
       throw error;
     });
-  return res;
+  if (resWord.length > 0) return resWord;
+
+  // 名前検索の結果が0件の場合はログインIDから検索する
+  const resLoginId = await axios
+    .get(endPoint, { params: { ...params, loginId_like: _search } })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      throw error;
+    });
+
+  return resLoginId;
 }
 
 export async function getAllDataNums() {
