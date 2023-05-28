@@ -1,74 +1,47 @@
 import axios from "axios";
-import { TeacherRequestParams } from "../types/type";
+import {
+  ExtendedTeacherRequestParams,
+  TeacherRequestParams,
+} from "../types/type";
 
 const endPoint =
   "https://us-central1-compass-hr.cloudfunctions.net/mock/facilitators";
 
 export async function fetchFacilitators({
-  _page,
-  _limit,
+  _page = "1",
+  _limit = "20",
   _sort,
-  _order,
-  _serch,
+  _order = "asc",
+  _search,
 }: TeacherRequestParams): Promise<any> {
-  if (_serch === "" || !_serch) {
-    const res = await axios
-      .get(endPoint, {
-        params: {
-          _page,
-          _limit,
-          _sort,
-          _order,
-        },
-      })
-      .then((response) => {
-        return new Promise((resolve) => {
-          setTimeout(() => resolve(response.data), 1000); // 1秒遅らせる
-        });
-      })
-      .catch((error) => {
-        throw error;
-      });
-    return res;
-  } else {
-    const resName = await axios
-      .get(endPoint, {
-        params: {
-          _page,
-          _limit,
-          _sort,
-          _order,
-          name_like: _serch,
-        },
-      })
-      .then((response) => response.data)
-      .catch((error) => {
-        throw error;
-      });
-    if (resName && resName.length > 0) {
-      return resName;
-    }
-    const resLoginId = await axios
-      .get(endPoint, {
-        params: {
-          _page,
-          _limit,
-          _sort,
-          _order,
-          loginId_like: _serch,
-        },
-      })
-      .then((response) => response.data)
-      .catch((error) => {
-        throw error;
-      });
-    return resLoginId;
+  const params: ExtendedTeacherRequestParams = {
+    _page,
+    _limit,
+    _sort,
+    _order,
+  };
+
+  if (_search) {
+    params["name_like"] = _search;
+    params["loginId_like"] = _search;
   }
+
+  const res = await axios
+    .get(endPoint, { params })
+    .then((response) => {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(response.data), 1000); // ローダー表示のため1秒遅らせる
+      });
+    })
+    .catch((error) => {
+      throw error;
+    });
+  return res;
 }
 
 export async function getAllDataNums() {
   const res = await axios
-    .get("https://us-central1-compass-hr.cloudfunctions.net/mock/facilitators")
+    .get(endPoint)
     .then((response) => {
       return response.data.length;
     })

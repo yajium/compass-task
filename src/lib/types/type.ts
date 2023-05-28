@@ -6,14 +6,18 @@ export type Teacher = {
 
 export type TeacherRequestParams = {
   _page: string;
-  _limit?: string;
+  _limit: string;
   _sort?: "name" | "loginId";
   _order?: "desc" | "asc";
-  _serch?: string;
+  _search?: string;
+};
+
+export type ExtendedTeacherRequestParams = TeacherRequestParams & {
+  name_like?: string;
+  loginId_like?: string;
 };
 
 export type TeacherRequestType = {
-  page?: string;
   limit?: string;
   sort?: "name" | "loginId";
   order?: "desc" | "asc";

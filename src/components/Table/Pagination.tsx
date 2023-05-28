@@ -4,26 +4,26 @@ import AngleRightIcon from "../../assets/icon-angle-right.svg";
 import { TeacherRequestParams } from "../../lib/types/type";
 
 export default function Pagination({
-  page,
   total,
-  limit = "20",
+  requestParams,
   setRequestParams,
 }: {
-  page: string;
   total: number;
-  limit?: string;
+  requestParams: TeacherRequestParams;
   setRequestParams: Dispatch<SetStateAction<TeacherRequestParams>>;
 }) {
-  // ページネーション：n〜n+limit件を表示する部分
-  const startIndex = (parseInt(page) - 1) * 20 + 1;
-  let endIndex = parseInt(page) * parseInt(limit);
+  const page = parseInt(requestParams._page);
+  const limit = parseInt(requestParams._limit);
 
+  // ページネーション：n〜n+limit件を表示する部分
+  const startIndex = (page - 1) * 20 + 1;
+  let endIndex = page * limit;
   if (endIndex > total) {
     endIndex = total;
   }
 
   // ページネーション：ページ番号を表示する部分
-  const totalPageNumber = Math.ceil(total / parseInt(limit));
+  const totalPageNumber = Math.ceil(total / limit);
   const pages = Array.from({ length: totalPageNumber }, (_, i) => i + 1);
 
   function handlePagenate(page: number) {
@@ -40,14 +40,14 @@ export default function Pagination({
       <div className="flex flex-row items-center">
         <button
           type="button"
-          disabled={page === "1"}
+          disabled={page === 1}
           className="mx-2 rounded bg-gray-200 px-3 py-2 text-white"
-          onClick={() => handlePagenate(parseInt(page) - 1)}
+          onClick={() => handlePagenate(page - 1)}
         >
           <img src={AngleLeftIcon} alt="angle-left" width={16} height={16} />
         </button>
         {pages.map((pageNumber) => {
-          const isActive = pageNumber === parseInt(page);
+          const isActive = pageNumber === page;
           return (
             <button
               key={pageNumber}
@@ -64,9 +64,9 @@ export default function Pagination({
         })}
         <button
           type="button"
-          disabled={page === totalPageNumber.toString()}
+          disabled={page === totalPageNumber}
           className="mx-2 rounded bg-gray-200 px-3 py-2 text-white"
-          onClick={() => handlePagenate(parseInt(page) + 1)}
+          onClick={() => handlePagenate(page + 1)}
         >
           <img src={AngleRightIcon} alt="angle-left" width={16} height={16} />
         </button>

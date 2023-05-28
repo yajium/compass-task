@@ -1,24 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SearchIcon from "../../assets/icon-search.svg";
 import TeacherIcon from "../../assets/icon-teacher.svg";
+import NetworkError from "../../components/Status/Error/NetworkError";
 import TeacherTable from "../../components/Table/TeacherTable";
 import { getAllDataNums } from "../../lib/api/api";
+import { TeacherRequestParams } from "../../lib/types/type";
 
 export default function Account() {
   const [allDataNums, setAllDataNums] = useState("");
-  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading"
+  );
+  const serchInputRef = useRef<HTMLInputElement>(null);
+  const [requestParams, setRequestParams] = useState<TeacherRequestParams>({
+    _page: "1",
+    _limit: "20",
+    _sort: undefined,
+    _order: "asc",
+    _search: undefined,
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getAllDataNums();
-      setAllDataNums(data);
-    };
-
     fetchData();
   }, []);
 
+  function fetchData() {
+    setStatus("loading");
+    getAllDataNums()
+      .then(setAllDataNums)
+      .catch(() => {
+        setStatus("error");
+      });
+  }
+
   function handleSearch() {
-    console.log(search);
+    if (!serchInputRef.current) return;
+    setRequestParams((prev) => ({
+      ...prev,
+      _serch: serchInputRef.current?.value,
+    }));
+  }
+
+  if (status === "error") {
+    return <NetworkError retry={fetchData} />;
   }
 
   return (
@@ -31,9 +55,10 @@ export default function Account() {
         <div className="rounded border border-gray-300">
           <input
             type="text"
+            name="serch"
             placeholder="名前、ログインIDで検索"
             className="py-2 pl-3 pr-20 outline-none"
-            onChange={(e) => setSearch(e.target.value)}
+            ref={serchInputRef}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSearch();
@@ -50,7 +75,11 @@ export default function Account() {
         </div>
       </div>
       <div className="my-12">
-        <TeacherTable total={parseInt(allDataNums)} search={search} />
+        <TeacherTable
+          total={parseInt(allDataNums)}
+          requestParams={requestParams}
+          setRequestParams={setRequestParams}
+        />
       </div>
     </div>
   );
