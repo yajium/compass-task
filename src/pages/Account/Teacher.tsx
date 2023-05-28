@@ -37,7 +37,7 @@ export default function Account() {
     if (!serchInputRef.current) return;
     setRequestParams((prev) => ({
       ...prev,
-      _serch: serchInputRef.current?.value,
+      _search: serchInputRef.current?.value,
     }));
   }
 

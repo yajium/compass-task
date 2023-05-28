@@ -57,3 +57,4 @@ home/
 
 - 現時点だと Teacher.tsx から requestParams と setRequestParams を TeacherTable に props で渡して、さらに TeacherTable から Pagination にその 2 つを 2 つをリレーしている形になってしまっているので、どうするのが良いのかがまだ理解できていないです。Context で渡しても set する用の関数をいずれ渡すことになると思うので、Reacoil とか Jotai とか状態管理ライブラリ使った方が良かった気がしています。
 - name のソートがうまくソートされない状態で返ってきます。[https://us-central1-compass-hr.cloudfunctions.net/mock/facilitators?\_sort=name](https://us-central1-compass-hr.cloudfunctions.net/mock/facilitators?_sort=name)を叩くと名前順で先生\_1 から順にとてるはずですが、取れていないようです。API 側の問題？かもしれないです。
+- 絞り込みについて、API のクエリとして`name_like=`と`loginId_like=`で分かれていますが、検索欄は名前/ログイン ID で分かれていないので、ワードが入力されたらまずは`name_like`の方で検索し、0 件だった場合は`loginId_like`の方で検索するようにしました。
