@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import AngleDownIcon from "../../assets/icon-angle-down.svg";
 import { fetchFacilitators } from "../../lib/api/api";
-import { Teacher, TeacherRequestParams } from "../../lib/types/type";
+import { Teacher, TeacherRequestParams } from "../../types/type";
 import NetworkError from "../Status/Error/NetworkError";
 import Loading from "../Status/Loading/Loading";
 import NoData from "../Status/NoData.tsx/NoData";

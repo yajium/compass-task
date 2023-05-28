@@ -4,7 +4,7 @@ import TeacherIcon from "../../assets/icon-teacher.svg";
 import NetworkError from "../../components/Status/Error/NetworkError";
 import TeacherTable from "../../components/Table/TeacherTable";
 import { getAllDataNums } from "../../lib/api/api";
-import { TeacherRequestParams } from "../../lib/types/type";
+import { TeacherRequestParams } from "../../types/type";
 
 export default function Account() {
   const [allDataNums, setAllDataNums] = useState("");

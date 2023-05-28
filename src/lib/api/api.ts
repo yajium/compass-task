@@ -2,10 +2,10 @@ import axios from "axios";
 import {
   ExtendedTeacherRequestParams,
   TeacherRequestParams,
-} from "../types/type";
+} from "../../types/type";
 
 const endPoint =
-  "https://us-central1-compass-hr.cloudfunctions.net/mock/facilitators";
+  "https://us-central1-compass-hr.cloudfunctions.net/mock/facilitator";
 
 export async function fetchFacilitators({
   _page = "1",
@@ -29,9 +29,7 @@ export async function fetchFacilitators({
   const res = await axios
     .get(endPoint, { params })
     .then((response) => {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(response.data), 1000); // ローダー表示のため1秒遅らせる
-      });
+      return response.data;
     })
     .catch((error) => {
       throw error;

@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import AngleLeftIcon from "../../assets/icon-angle-left.svg";
 import AngleRightIcon from "../../assets/icon-angle-right.svg";
-import { TeacherRequestParams } from "../../lib/types/type";
+import { TeacherRequestParams } from "../../types/type";
 
 export default function Pagination({
   total,
