@@ -16,11 +16,3 @@ export type ExtendedTeacherRequestParams = TeacherRequestParams & {
   name_like?: string;
   loginId_like?: string;
 };
-
-export type TeacherRequestType = {
-  limit?: string;
-  sort?: "name" | "loginId";
-  order?: "desc" | "asc";
-  search?: string;
-  total: number;
-};

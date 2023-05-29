@@ -33,6 +33,10 @@ export default function TeacherTable({
       .catch(() => {
         setData({ status: "error", teachers: null });
       });
+
+    return () => {
+      setData({ status: "loading", teachers: null });
+    };
   }, [requestParams]);
 
   function handleSort(sortOption: "name" | "loginId") {
