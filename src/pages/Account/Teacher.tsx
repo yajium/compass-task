@@ -6,7 +6,7 @@ import TeacherTable from "../../components/Table/TeacherTable";
 import { getAllDataNums } from "../../lib/api/api";
 import { TeacherRequestParams } from "../../types/type";
 
-export default function Account() {
+export default function Teacher() {
   const [allDataNums, setAllDataNums] = useState("");
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
