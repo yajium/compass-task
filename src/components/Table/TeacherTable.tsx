@@ -1,73 +1,13 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import AngleDownIcon from "../../assets/icon-angle-down.svg";
-import { fetchFacilitators } from "../../lib/api/api";
-import { Teacher, TeacherRequestParams } from "../../types/type";
-import NetworkError from "../Status/Error/NetworkError";
-import Loading from "../Status/Loading/Loading";
-import NoData from "../Status/NoData.tsx/NoData";
-import Pagination from "./Pagination";
+import { Teacher } from "../../types/type";
 
-export default function TeacherTable({
-  total,
-  requestParams,
-  setRequestParams,
-}: {
-  total: number;
-  requestParams: TeacherRequestParams;
-  setRequestParams: Dispatch<SetStateAction<TeacherRequestParams>>;
-}) {
-  const [data, setData] = useState<{
-    status: "loading" | "success" | "error";
-    teachers: Teacher[] | null;
-  }>({
-    status: "loading",
-    teachers: null,
-  });
+export type TeacherTableProps = {
+  teachers: Teacher[];
+  onSort: (sortOption: "name" | "loginId") => void;
+};
 
-  useEffect(() => {
-    setData({ status: "loading", teachers: null });
-    fetchFacilitators(requestParams)
-      .then((teachers) => {
-        setData({ status: "success", teachers });
-      })
-      .catch(() => {
-        setData({ status: "error", teachers: null });
-      });
-
-    return () => {
-      setData({ status: "loading", teachers: null });
-    };
-  }, [requestParams]);
-
-  function handleSort(sortOption: "name" | "loginId") {
-    setRequestParams((prev) => ({
-      ...prev,
-      _sort: sortOption,
-      _order: prev._order === "asc" ? "desc" : "asc",
-    }));
-  }
-
-  switch (data.status) {
-    case "loading":
-      return <Loading />;
-    case "error":
-      return (
-        <NetworkError
-          retry={() => {
-            setData({ status: "loading", teachers: null });
-            fetchFacilitators(requestParams).catch(() =>
-              setData({ status: "error", teachers: null })
-            );
-          }}
-        />
-      );
-    case "success":
-      if (!data.teachers || data.teachers.length === 0) {
-        return <NoData />;
-      }
-      break;
-  }
-
+// 名前とログインIDだけを持たせる
+export default function TeacherTable({ teachers, onSort }: TeacherTableProps) {
   return (
     <div>
       <table className="w-full border-collapse border border-gray-300">
@@ -79,7 +19,7 @@ export default function TeacherTable({
                 <button
                   type="button"
                   className="px-2"
-                  onClick={() => handleSort("name")}
+                  onClick={() => onSort("name")}
                 >
                   <img
                     src={AngleDownIcon}
@@ -97,7 +37,7 @@ export default function TeacherTable({
                 <button
                   type="button"
                   className="px-2"
-                  onClick={() => handleSort("loginId")}
+                  onClick={() => onSort("loginId")}
                 >
                   <img
                     src={AngleDownIcon}
@@ -113,7 +53,7 @@ export default function TeacherTable({
           </tr>
         </thead>
         <tbody>
-          {data.teachers.map((teacher, index) => {
+          {teachers.map((teacher, index) => {
             const evenClass = index % 2 === 0 ? "bg-white" : "bg-gray-50";
             return (
               <tr
@@ -132,11 +72,6 @@ export default function TeacherTable({
           })}
         </tbody>
       </table>
-      <Pagination
-        total={total}
-        requestParams={requestParams}
-        setRequestParams={setRequestParams}
-      />
     </div>
   );
 }

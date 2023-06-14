@@ -2,15 +2,44 @@ import { useEffect, useRef, useState } from "react";
 import SearchIcon from "../../assets/icon-search.svg";
 import TeacherIcon from "../../assets/icon-teacher.svg";
 import NetworkError from "../../components/Status/Error/NetworkError";
-import TeacherTable from "../../components/Table/TeacherTable";
-import { getAllDataNums } from "../../lib/api/api";
-import { TeacherRequestParams } from "../../types/type";
+import Loading from "../../components/Status/Loading/Loading";
+import NoData from "../../components/Status/NoData.tsx/NoData";
+import Pagination from "../../components/Table/Pagination";
+import TeacherTable, {
+  TeacherTableProps,
+} from "../../components/Table/TeacherTable";
+import { fetchFacilitators, getAllDataNums } from "../../lib/api/api";
+import { Teacher as TeacherData, TeacherRequestParams } from "../../types/type";
+
+const TableContent = ({
+  status,
+  ...teacherTableProps
+}: { status: "loading" | "success" | "error" } & TeacherTableProps) => {
+  if (status === "loading") {
+    return <Loading />;
+  }
+
+  if (status === "success") {
+    if (
+      !teacherTableProps.teachers ||
+      teacherTableProps.teachers.length === 0
+    ) {
+      return <NoData />;
+    }
+  }
+
+  return <TeacherTable {...teacherTableProps} />;
+};
 
 export default function Teacher() {
   const [allDataNums, setAllDataNums] = useState("");
-  const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
-  );
+  const [data, setData] = useState<{
+    status: "loading" | "success" | "error";
+    teachers: TeacherData[] | null;
+  }>({
+    status: "loading",
+    teachers: null,
+  });
   const serchInputRef = useRef<HTMLInputElement>(null);
   const [requestParams, setRequestParams] = useState<TeacherRequestParams>({
     _page: "1",
@@ -25,11 +54,14 @@ export default function Teacher() {
   }, []);
 
   function fetchData() {
-    setStatus("loading");
+    setData({ ...data, status: "loading" });
     getAllDataNums()
-      .then(setAllDataNums)
+      .then((res) => {
+        setAllDataNums(res);
+        setData({ ...data, status: "success" });
+      })
       .catch(() => {
-        setStatus("error");
+        setData({ ...data, status: "error" });
       });
   }
 
@@ -41,9 +73,30 @@ export default function Teacher() {
     }));
   }
 
-  if (status === "error") {
-    return <NetworkError retry={fetchData} />;
+  function handleSort(sortOption: "name" | "loginId") {
+    setRequestParams((prev) => ({
+      ...prev,
+      _sort: sortOption,
+      _order: prev._order === "asc" ? "desc" : "asc",
+    }));
   }
+
+  useEffect(() => {
+    setData({ status: "loading", teachers: null });
+    fetchFacilitators(requestParams)
+      .then((teachers) => {
+        setData({ status: "success", teachers });
+      })
+      .catch(() => {
+        setData({ ...data, status: "error" });
+      });
+
+    return () => {
+      setData({ status: "loading", teachers: null });
+    };
+  }, [requestParams]);
+
+  if (data.status === "error") return <NetworkError retry={fetchData} />;
 
   return (
     <div>
@@ -75,7 +128,12 @@ export default function Teacher() {
         </div>
       </div>
       <div className="my-12">
-        <TeacherTable
+        <TableContent
+          status={data.status}
+          teachers={data.teachers || []}
+          onSort={handleSort}
+        />
+        <Pagination
           total={parseInt(allDataNums)}
           requestParams={requestParams}
           setRequestParams={setRequestParams}
